@@ -1,5 +1,6 @@
 package ru.pflb.scores.service.impl;
 
+import org.springframework.stereotype.Component;
 import ru.pflb.scores.dto.HighScores;
 import ru.pflb.scores.dto.LevelHighScores;
 import ru.pflb.scores.service.LoginService;
@@ -9,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Component
 public class InMemoryScoreService implements ScoreService {
 
     private final LoginService loginService;
@@ -19,9 +21,19 @@ public class InMemoryScoreService implements ScoreService {
     }
 
     @Override
-    public void record(String sessionKey, int score, int levelId) {
+    public String record(String sessionKey, int score, int levelId) {
         var userId = loginService.getUserId(sessionKey);
         recordScore(userId, levelId, score);
+        return sessionKey;
+    }
+
+    @Override
+    public String recordAnotherUser(String sessionKey, int score, int levelId, int userId) {
+        var currentUserId = loginService.getUserId(sessionKey);
+        if (currentUserId > 0) {
+            recordScore(userId, levelId, score);
+        }
+        return sessionKey;
     }
 
     private void recordScore(int userId, int levelId, int score) {
@@ -36,6 +48,6 @@ public class InMemoryScoreService implements ScoreService {
     public String highScores(int levelId) {
         return Optional.ofNullable(scoreboard.get(levelId))
                 .map(LevelHighScores::getHighScores)
-                .map(HighScores::toString).orElse("");
+                .map(HighScores::toString).orElse("no data");
     }
 }
