@@ -1,17 +1,32 @@
 package ru.pflb.scores.http;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import ru.pflb.scores.service.LoginService;
+import ru.pflb.scores.service.ScoreService;
 
 @RestController
 public class ScoresController {
 
 
-    @GetMapping(path = "/hiscores/{levelId}")
-    //TODO implement
+    private final ScoreService scoreService;
 
-    @PostMapping(path = "/score/{levelId}/{userId}")
+    //private final LoginService loginService;
+
+    @Autowired
+    public ScoresController(ScoreService scoreService, LoginService loginService) {
+        this.scoreService = scoreService;
+        //this.loginService = loginService;
+    }
+    @GetMapping(path = "/hiscores/{levelId}")
+    public String getHighScores(@PathVariable int levelId) {
+        return scoreService.highScores(levelId);
+    }
+
+    @PostMapping(path = "/score/{levelId}/{userId}?sessionKey={sessionKey}")
+    public String recordLevel(@PathVariable int userId, int levelId, @RequestParam String sessionKey, @RequestBody int score) {
+        scoreService.record(sessionKey, score, levelId);
+        return scoreService.highScores(levelId);
+    }
     //TODO implement; pass sessionKey as Query Param (/.../../..?session={sessionKey})
 }
