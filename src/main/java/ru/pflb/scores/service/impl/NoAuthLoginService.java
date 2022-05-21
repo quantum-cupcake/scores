@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import ru.pflb.scores.service.LoginService;
 import ru.pflb.scores.util.SessionEvictingHolder;
 
-@Component
+@Service
 public class NoAuthLoginService implements LoginService {
 
     public NoAuthLoginService(SessionEvictingHolder sessionHolder) {
